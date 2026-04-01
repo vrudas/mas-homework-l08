@@ -1,6 +1,6 @@
 import uuid
 
-from agent import agent
+from research import agent
 
 
 def main():
