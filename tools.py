@@ -7,6 +7,8 @@ from langchain_core.tools import tool
 from config import settings
 from retriever import get_retriever
 
+retriever = get_retriever()
+
 
 @tool
 def web_search(query: str) -> list[dict]:
@@ -65,7 +67,6 @@ def knowledge_search(query: str) -> str:
     """Search the local knowledge base using hybrid retrieval + reranking.
     Args: query: search string"""
     try:
-        retriever = get_retriever()
         response = retriever.invoke(query)
         return str(response)
     except Exception:
