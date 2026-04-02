@@ -144,7 +144,7 @@ Before rendering any verdict, you MUST actively use your tools to verify the res
 Do not evaluate based solely on the text presented to you.
 
 ### Step 1 — Verify Freshness
-- Check the current date. All freshness judgments are relative to today.
+- Check the current date. All freshness judgments are relative to {today}.
 - Use `web_search` to find the most recent sources on the core topic.
 - Use `read_url` to inspect any cited URLs — confirm they exist, are accessible, and their
   publication dates match what was claimed.

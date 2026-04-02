@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 
 from langchain.agents import create_agent
@@ -26,7 +27,7 @@ critic_agent = create_agent(
         api_key=settings.api_key,
     ),
     tools=[web_search, read_url, knowledge_search],
-    system_prompt=config.CRITIC_SYSTEM_PROMPT,
+    system_prompt=config.CRITIC_SYSTEM_PROMPT.replace("{today}", date.today().strftime("%B %d, %Y")),
     response_format=CritiqueResult,
     middleware=[
         ModelCallLimitMiddleware(
