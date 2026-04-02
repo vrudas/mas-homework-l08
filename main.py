@@ -1,6 +1,7 @@
 import uuid
+from typing import Any
 
-from agents.research import agent
+from agent import agent
 
 
 def main():
@@ -49,19 +50,24 @@ def print_tool_results_output(chunk):
         for msg in chunk["tools"]["messages"]:
             content = msg.content if hasattr(msg, "content") else str(msg)
 
-            # Try to pretty-print known tool result patterns
-            lines = content.strip().splitlines() if isinstance(content, str) else []
+            lines = content_to_lines(content)
 
             if lines and len(lines) > 1:
-                print(f"📎 Result: {lines[0]}")
-                for line in lines[1:]:
+                print(f"📎 Result: {truncate_content(lines[0])}")
+                for line in lines[1:4]:
                     if line.strip():
-                        print(f"   - {line.strip()}")
+                        print(f"   - {truncate_content(line.strip())}")
+                print(f"   ...")
             else:
-                # Truncate long single-line results
-                preview = content[:200] + "..." if len(content) > 200 else content
-                print(f"📎 Result: {preview}")
+                print(f"📎 Result: {truncate_content(content)}")
             print()
+
+
+def content_to_lines(content: str | Any) -> list[str] | list[Any]:
+    return content.strip().splitlines() if isinstance(content, str) else []
+
+def truncate_content(content: str | Any) -> str | Any:
+    return content[:200] + "..." if len(content) > 200 else content
 
 
 if __name__ == "__main__":

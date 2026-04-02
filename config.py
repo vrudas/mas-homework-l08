@@ -51,7 +51,7 @@ Follow these steps for every user request, in order:
 ## Constraints
 - Never fabricate facts. If a search returns no useful results, rephrase and try again.
 - If a tool returns an error, note it and continue with other sources — do not stop.
-- Always call `write_report` before giving your final answer.
+- Always call `write_report` tool before giving your final answer.
 - The report must include a `## Sources` section listing every URL you read.
 - Filenames must be lowercase with underscores, ending in `.md`.
 
