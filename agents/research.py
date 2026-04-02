@@ -15,7 +15,7 @@ tools = [web_search, read_url, write_report, knowledge_search]
 
 memory = InMemorySaver()
 
-agent = create_agent(
+research_agent = create_agent(
     model=llm,
     tools=tools,
     middleware=[

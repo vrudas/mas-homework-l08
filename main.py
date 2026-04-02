@@ -1,7 +1,7 @@
 import uuid
 from typing import Any
 
-from agents.research import agent
+from agents.research import research_agent as agent
 
 
 def main():
