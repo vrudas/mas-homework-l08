@@ -3,7 +3,7 @@ from langchain.agents.middleware import ModelCallLimitMiddleware
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import InMemorySaver
 
-from config import settings, SYSTEM_PROMPT
+from config import settings, RESEARCH_SYSTEM_PROMPT
 from tools import web_search, write_report, read_url, knowledge_search
 
 llm = ChatOpenAI(
@@ -24,5 +24,5 @@ agent = create_agent(
         )
     ],
     checkpointer=memory,
-    system_prompt=SYSTEM_PROMPT,
+    system_prompt=RESEARCH_SYSTEM_PROMPT,
 )

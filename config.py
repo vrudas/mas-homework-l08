@@ -29,7 +29,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-SYSTEM_PROMPT = """
+RESEARCH_SYSTEM_PROMPT = """
 You are a Research Agent. Your sole purpose is to answer user questions by gathering information 
 from the web and producing a structured Markdown report saved to a file.
 
