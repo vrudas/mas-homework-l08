@@ -205,3 +205,5 @@ Populate every field honestly and precisely:
 - If a cited source contradicts the research conclusion, this is a critical gap — always flag it.
 - Maintain a neutral, analytical tone. You are an auditor, not an editor.
 """
+
+SUPERVISOR_SYSTEM_PROMPT = """"""
