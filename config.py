@@ -67,7 +67,12 @@ Guidelines:
 - Search for topics that seem underrepresented in the findings.
 - Be specific in `gaps` and `revision_requests` — name exactly what is missing or wrong.
 - Only set verdict to "APPROVE" if all three dimensions pass. Set to "REVISE" if any dimension has significant issues.
-- Return your evaluation as a structured CritiqueResult object.""".replace("{today}", date.today().strftime("%B %d, %Y"))
+- Return your evaluation as a structured CritiqueResult object.
+
+## CRITICAL — you MUST always finish with a structured CritiqueResult response.
+After your tool calls, IMMEDIATELY produce the CritiqueResult. Do not call any more tools after you have enough information to judge. Never end your turn without the structured output — returning it is your primary job.
+
+""".replace("{today}", date.today().strftime("%B %d, %Y"))
 
 SUPERVISOR_SYSTEM_PROMPT = """You are a research supervisor agent that orchestrates a multi-agent research pipeline. You coordinate three specialized agents — Planner, Researcher, and Critic — to produce high-quality research reports.
 
