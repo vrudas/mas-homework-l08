@@ -1,15 +1,18 @@
 import uuid
 from typing import Any
 
-from agents.research import research_agent as agent
+from langgraph.types import Command
+
+from supervisor import supervisor_agent
 
 
 def main():
-    print("Research Agent with RAG (type 'exit' to quit)")
-    print("-" * 40)
+    print("Multi-Agent Research System (type 'exit' to quit)")
+    print("-" * 50)
 
     # Create a unique thread ID for this conversation session
     thread_id = str(uuid.uuid4())
+    config = {"configurable": {"thread_id": thread_id}}
 
     while True:
         try:
@@ -25,12 +28,14 @@ def main():
             print("Goodbye!")
             break
 
-        for chunk in agent.stream(
-                {"messages": [("user", user_input)]},
-                config={"configurable": {"thread_id": thread_id}}
-        ):
-            print_tool_calls_from_model_output(chunk)
-            print_tool_results_output(chunk)
+        stream_agent(supervisor_agent, {"messages": [("user", user_input)]}, config)
+        handle_hitl(supervisor_agent, config)
+
+
+def stream_agent(agent, inputs, config):
+    for chunk in agent.stream(inputs, config=config):
+        print_tool_calls_from_model_output(chunk)
+        print_tool_results_output(chunk)
 
 
 def print_tool_calls_from_model_output(chunk):
@@ -38,8 +43,11 @@ def print_tool_calls_from_model_output(chunk):
         for msg in chunk["model"]["messages"]:
             if hasattr(msg, "tool_calls") and msg.tool_calls:
                 for call in msg.tool_calls:
-                    args_str = ", ".join(f'{k}="{v}"' for k, v in call["args"].items())
-                    print(f"🔧 Tool call: {call['name']}({args_str})")
+                    args_str = ", ".join(
+                        f'{k}="{truncate_content(str(v))}"'
+                        for k, v in call["args"].items()
+                    )
+                    print(f"🔧 {call['name']}({args_str})")
 
             if hasattr(msg, "content") and msg.content:
                 print(f"\nAgent: {msg.content}\n")
@@ -53,21 +61,84 @@ def print_tool_results_output(chunk):
             lines = content_to_lines(content)
 
             if lines and len(lines) > 1:
-                print(f"📎 Result: {truncate_content(lines[0])}")
-                for line in lines[1:4]:
+                print(f"  📎 {truncate_content(lines[0])}")
+                for line in lines[1:3]:
                     if line.strip():
-                        print(f"   - {truncate_content(line.strip())}")
-                print(f"   ...")
+                        print(f"     {truncate_content(line.strip())}")
+                if len(lines) > 4:
+                    print("     ...")
             else:
-                print(f"📎 Result: {truncate_content(content)}")
+                print(f"  📎 {truncate_content(content)}")
             print()
 
 
 def content_to_lines(content: str | Any) -> list[str] | list[Any]:
     return content.strip().splitlines() if isinstance(content, str) else []
 
+
 def truncate_content(content: str | Any) -> str | Any:
-    return content[:200] + "..." if len(content) > 200 else content
+    return content[:200] + "..." if isinstance(content, str) and len(content) > 200 else content
+
+
+def handle_hitl(agent, config):
+    """Check for pending interrupts and handle approve/edit/reject loop."""
+    while True:
+        state = agent.get_state(config)
+        if not state.interrupts:
+            break
+
+        interrupt = state.interrupts[0]
+
+        action_requests = interrupt.value.get("action_requests", [])
+        if not action_requests:
+            break
+
+        action = action_requests[0]
+        tool_name = action.get("name", "unknown")
+        tool_args = action.get("args", {})
+
+        print("\n" + "=" * 60)
+        print("⏸️  ACTION REQUIRES APPROVAL")
+        print("=" * 60)
+        print(f"  Tool    : {tool_name}")
+
+        filename = tool_args.get("filename", "report.md")
+        content = tool_args.get("content", "")
+
+        if tool_name == "save_report":
+            print(f"  File    : {filename}")
+            preview = content[:500] + ("..." if len(content) > 500 else "")
+            print(f"\n--- Report preview ---\n{preview}\n--- End preview ---\n")
+        else:
+            import json
+            print(f"  Args    : {json.dumps(tool_args, ensure_ascii=False)[:400]}")
+
+        decision = input("  👉 approve / reject: ").strip().lower()
+
+        if decision == "approve":
+            handle_approve(agent, config, filename)
+            break
+
+        elif decision == "reject":
+            handle_reject(agent, config)
+            break
+
+        else:
+            print("  Please enter 'approve' or 'reject'.")
+
+
+def handle_approve(agent, config, filename):
+    resume_cmd = Command(resume={"decisions": [{"type": "approve"}]})
+    stream_agent(agent, resume_cmd, config)
+    print(f"\n  ✅ Approved! Report saved to output/{filename}")
+
+
+def handle_reject(agent, config):
+    resume_cmd = Command(resume={
+        "decisions": [{"type": "reject", "message": "User rejected the report."}]
+    })
+    stream_agent(agent, resume_cmd, config)
+    print("\n  ❌ Report saving cancelled.")
 
 
 if __name__ == "__main__":
