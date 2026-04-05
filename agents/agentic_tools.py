@@ -3,16 +3,20 @@ from langchain_core.tools import tool
 from agents.critic import critic_agent
 from agents.planner import planner_agent
 from agents.research import research_agent
-from schemas import ResearchPlan
+from schemas import ResearchPlan, CritiqueResult
 
 
 @tool
 def research(request: str) -> str:
     """Execute research based on a plan or request. Returns comprehensive findings.
     Args: request: research plan or specific instructions for what to investigate"""
-    result = research_agent.invoke({"messages": [("user", request)]})
-    messages = result.get("messages", [])
-    return messages[-1].content if messages else "No findings returned."
+    try:
+        result = research_agent.invoke({"messages": [("user", request)]})
+        messages = result.get("messages", [])
+        return messages[-1].content if messages else "No findings returned."
+    except Exception as e:
+        print(f"Error during research: {e}")
+        return f"Error during research for: {request}"
 
 
 @tool
@@ -22,9 +26,10 @@ def critique(findings: str) -> str:
 
     try:
         result = critic_agent.invoke({"messages": [("user", findings)]})
-        return result["messages"][-1].content
+        critique_result: CritiqueResult = result["structured_response"]
+        return critique_result.model_dump_json(indent=2)
     except Exception as e:
-        print(f"Error during critique for: {findings}, error: {e}")
+        print(f"Error during critique: {e}")
         return f"Error during critique for: {findings}"
 
 
@@ -32,6 +37,10 @@ def critique(findings: str) -> str:
 def plan(request: str) -> str:
     """Decompose a research request into a structured ResearchPlan.
     Args: request: the user's original research request"""
-    result = planner_agent.invoke({"messages": [("user", request)]})
-    research_plan: ResearchPlan = result["structured_response"]
-    return research_plan.model_dump_json(indent=2)
+    try:
+        result = planner_agent.invoke({"messages": [("user", request)]})
+        research_plan: ResearchPlan = result["structured_response"]
+        return research_plan.model_dump_json(indent=2)
+    except Exception as e:
+        print(f"Error during planning: {e}")
+        return f"Error during planning for: {request}"
