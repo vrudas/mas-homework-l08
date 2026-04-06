@@ -1,0 +1,25 @@
+| **Aspect**                          | **Naive RAG**                                                                    | **Sentence-Window RAG**                                                         | **Parent-Child RAG**                                                                 |
+|-------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| **Definition**                      | Simple RAG employing basic retrieval techniques, splitting documents into chunks. | Enhances naive RAG by using a sliding window approach for chunk retrieval.        | Retrieves child chunks first and then augments the context with parent chunks.        |
+| **Mechanism**                      | Documents split into static chunks, indexed, and retrieved directly.           | Documents are segmented into small chunks, expanding context dynamically.         | Finds relevant child chunks and fetches broader parent context to enhance relevance.  |
+| **Advantages**                      | - Easy to implement and straightforward.<br>- Lower setup complexity.        | - Provides a better context for generation by dynamically retrieving related text. | - Enhances retrieval precision and reduces ambiguity by providing additional context.  |
+|                                     | - Can achieve good results for simple queries.                                | - Improves relevance by connecting smaller and larger contextual pieces.          | - Effective for documents covering multiple topics, improving meaningful retrieval.    |
+| **Disadvantages**                   | - Can lead to irrelevant retrieval due to static chunking.                    | - Can increase computational load due to dynamic expansion.                       | - Requires more processing and setup effort; potentially higher complexity.            |
+|                                     | - Less effective for complex queries needing deeper context.                   | - May not fully utilize larger context if not all relevant chunks are retrieved.  | - Complexity in managing chunk hierarchies and embeddings.                           |
+| **Evaluation Metrics**             | Often assessed through standard retrieval benchmarks (accuracy, recall).      | Performance metrics include retrieval precision and context coherence.            | Metrics focus on retrieval effectiveness and quality of integrated responses.          |
+|                                     | - Simple metrics like F1 scores can be applied.                               | - Context recall and relevance scores evaluated through specific query tasks.     | - Often evaluated by user satisfaction and performance in multi-hop queries.          |
+| **Real-World Applications**        | - Basic chatbots and simple customer service systems.                          | - Common in AI-driven assistance and knowledge-based solutions, enhancing search. | - Used in complex knowledge management systems, ensuring context-rich responses.      |
+|                                     | - Often used for internal systems with straightforward queries.                | - Popular in educational tools and content generation where context is critical.  | - Implemented in organizational settings requiring detailed policy and process lookup. |
+
+### Additional Insights:
+- **Naive RAG** is suitable for applications with well-defined and straightforward queries. Its simplicity makes it a good starting point for organizations experimenting with RAG. However, it can falter in scenarios requiring nuanced understanding due to its primitive context management.
+  
+- **Sentence-Window RAG** improves upon the naive approach by refining how retrieved data is contextualized during prompt preparation, leading to more informed generation. It is particularly effective for systems with dynamic and varied user inputs.
+
+- **Parent-Child RAG** offers a structural advantage in scenarios where topics within documents are interrelated or where additional context improves the response accuracy. It requires more sophisticated management of information hierarchies and embeddings but can yield more comprehensive outputs.
+
+### References:
+1. Medium articles on RAG strategies ([Harsh Loomba](https://www.linkedin.com/posts/harsh-loomba-b0a51927_beyond-naive-rag-comparing-basic-sentence-window-activity-7416871691743801344-co6G)).
+2. GraphRAG documentation on parent-child retrieval mechanisms ([GraphRAG](https://graphrag.com/reference/graphrag/parent-child-retriever/)).
+3. Evaluation metrics and benchmarks for RAG systems ([Evidently AI](https://www.evidentlyai.com/blog/rag-examples)).
+4. Advanced techniques and real-world applications outlined through practical examples and case studies.
