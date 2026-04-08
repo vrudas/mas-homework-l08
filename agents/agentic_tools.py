@@ -21,11 +21,12 @@ def research(request: str) -> str:
 
 @tool
 def critique(findings: str) -> str:
-    """Evaluate research findings for freshness, completeness, and structure.
+    """Evaluate research findings for freshness, completeness, and structure then return structured response as a CritiqueResult object.
     Args: findings: the research findings text to evaluate"""
 
     try:
         result = critic_agent.invoke({"messages": [("user", findings)]})
+        print(f"Critique: {result}")
         critique_result: CritiqueResult = result["structured_response"]
         return critique_result.model_dump_json(indent=2)
     except Exception as e:
