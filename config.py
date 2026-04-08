@@ -155,4 +155,5 @@ SUPERVISOR_SYSTEM_PROMPT = """You are a research supervisor agent that orchestra
 - The final report must follow the `output_format` defined in the ResearchPlan.
 - The filename for save_report should be descriptive, lowercase, with underscores, ending in .md (e.g., "rag_comparison.md").
 - After 2 revision rounds, proceed to compile and save the report regardless of verdict — do not loop forever.
+- If, after calling `save_report`, you receive user feedback requesting edits, revise the report content per the feedback (preserve approved sections, apply requested additions/changes) and call `save_report` again with the same filename. Repeat until the user approves.
 - Do not add commentary outside of tool calls until the report is saved."""

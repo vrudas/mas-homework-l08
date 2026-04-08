@@ -113,24 +113,46 @@ def handle_hitl(agent, config):
             import json
             print(f"  Args    : {json.dumps(tool_args, ensure_ascii=False)[:400]}")
 
-        decision = input("  👉 approve / reject: ").strip().lower()
+        decision = input("  👉 approve / edit / reject: ").strip().lower()
 
         if decision == "approve":
             handle_approve(agent, config, filename)
             break
+
+        elif decision == "edit":
+            feedback = input("  ✏️  Your feedback: ").strip()
+            if not feedback:
+                print("  Feedback cannot be empty.")
+                continue
+            handle_edit(agent, config, feedback)
 
         elif decision == "reject":
             handle_reject(agent, config)
             break
 
         else:
-            print("  Please enter 'approve' or 'reject'.")
+            print("  Please enter 'approve', 'edit', or 'reject'.")
 
 
 def handle_approve(agent, config, filename):
     resume_cmd = Command(resume={"decisions": [{"type": "approve"}]})
     stream_agent(agent, resume_cmd, config)
     print(f"\n  ✅ Approved! Report saved to output/{filename}")
+
+
+def handle_edit(agent, config, feedback):
+    resume_cmd = Command(resume={
+        "decisions": [{
+            "type": "reject",
+            "message": (
+                f"User requested edits to the report. Feedback: {feedback}\n"
+                f"Revise the report accordingly and call save_report again "
+                f"with the same filename."
+            ),
+        }]
+    })
+    print("\n  ✏️  Revising report based on feedback...\n")
+    stream_agent(agent, resume_cmd, config)
 
 
 def handle_reject(agent, config):
