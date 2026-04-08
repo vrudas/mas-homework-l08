@@ -22,7 +22,17 @@ def research(request: str) -> str:
 @tool
 def critique(findings: str) -> str:
     """Evaluate research findings for freshness, completeness, and structure then return structured response as a CritiqueResult object.
-    Args: findings: the research findings text to evaluate"""
+    Args: findings: the research findings text to evaluate
+    Example: {
+        "verdict": "APPROVE"
+        "is_fresh": "True"
+        "is_complete": "True"
+        "is_well_structured": "True"
+        "strengths": ["strength1", "strength2", "strength3", "strength4", "strength5", "strength6"]
+        "gaps": ["gap1", "gap2", "gap3", "gap4", "gap5", "gap6"]
+        "revision_requests": ["request1", "request2", "request3", "request4", "request5", "request6"]
+    }
+    """
 
     try:
         result = critic_agent.invoke({"messages": [("user", findings)]})
